@@ -7,13 +7,13 @@ import "io/ioutil"
 
 type Test struct {
 	passphrase string
-	salt string
-	private string
-	address string
+	salt       string
+	private    string
+	address    string
 }
 
 // these tests come from https://github.com/keybase/warpwallet/blob/master/test/spec.json, on 2013-11-28
-var tests []Test = []Test {
+var tests []Test = []Test{
 	Test{"ER8FT+HFjk0", "7DpniYifN6c", "5JfEekYcaAexqcigtFAy4h2ZAY95vjKCvS1khAkSG8ATo1veQAD", "1J32CmwScqhwnNQ77cKv9q41JGwoZe2JYQ"},
 	Test{"YqIDBApDYME", "G34HqIgjrIc", "5KUJA5iZ2zS7AXkU2S8BiBVY3xj6F8GspLfWWqL9V7CajXumBQV", "19aKBeXe2mi4NbQRpYUrCLZtRDHDUs9J7J"},
 	Test{"FPdAxCygMJg", "X+qaSwhUYXw", "5JBAonQ4iGKFJxENExZghDtAS6YB8BsCw5mwpHSvZvP3Q2UxmT1", "14Pqeo9XNRxjtKFFYd6TvRrJuZxVpciS81"},
@@ -34,17 +34,17 @@ var tests []Test = []Test {
 
 func TestBasic(t *testing.T) {
 	fmt.Printf("This takes a while, so hold on :)\n")
-    for i, test := range tests {
-    	fmt.Printf("Testing %d of %d...\n", i+1, len(tests))
+	for i, test := range tests {
+		fmt.Printf("Testing %d of %d...\n", i+1, len(tests))
 
-    	pass, salt := getInputFromUser(ioutil.Discard, strings.NewReader(test.passphrase + "\n" + test.salt + "\n"))
+		pass, salt := getInputFromUser(ioutil.Discard, strings.NewReader(test.passphrase+"\n"+test.salt+"\n"))
 
-    	private, address := generate(pass, salt)
-    	if private != test.private {
+		private, address := generate(pass, salt)
+		if private != test.private {
 			t.Errorf("%s, %s: expected private %s, got %s", test.passphrase, test.salt, test.private, private)
 		}
 		if address != test.address {
 			t.Errorf("%s, %s: expected address %s, got %s", test.passphrase, test.salt, test.address, address)
 		}
-    }
+	}
 }

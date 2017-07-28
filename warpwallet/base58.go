@@ -133,10 +133,10 @@ func Hex2Base58(val []byte) Base58 {
 	return Base58(answer) //returns
 }
 
-func Hex2Big(b []byte) *big.Int{
-	answer:=big.NewInt(0)
+func Hex2Big(b []byte) *big.Int {
+	answer := big.NewInt(0)
 
-	for i:=0; i<len(b); i++{
+	for i := 0; i < len(b); i++ {
 		answer.Lsh(answer, 8)
 		answer.Add(answer, big.NewInt(int64(b[i])))
 	}

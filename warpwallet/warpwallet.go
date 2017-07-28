@@ -2,13 +2,13 @@
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met: 
+// modification, are permitted provided that the following conditions are met:
 
 // 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer. 
+//    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 //    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution. 
+//    and/or other materials provided with the distribution.
 
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -23,16 +23,17 @@
 
 package main
 
-import "fmt"
-import "bufio"
-import "io"
-import "os"
-import "crypto/sha256"
-import "strings"
-
-import "code.google.com/p/go.crypto/scrypt"
-import "code.google.com/p/go.crypto/pbkdf2"
-import "code.google.com/p/go.crypto/ripemd160"
+import (
+	"bufio"
+	"crypto/sha256"
+	"fmt"
+	"golang.org/x/crypto/pbkdf2"
+	"golang.org/x/crypto/ripemd160"
+	"golang.org/x/crypto/scrypt"
+	"io"
+	"os"
+	"strings"
+)
 
 func main() {
 	passphrase, salt := getInputFromUser(os.Stdout, os.Stdin)
@@ -46,29 +47,29 @@ func getInputFromUser(ostream io.Writer, istream io.Reader) (string, string) {
 	scanner := bufio.NewScanner(istream)
 
 	fmt.Fprintf(ostream, "Please enter your passphrase: ")
-	passphrase := readln(scanner);
+	passphrase := readln(scanner)
 	if strings.HasSuffix(passphrase, "\r") {
-		fmt.Fprintf(ostream, "CAUTION!  Your passphrase ends with a \\r character.  Proceeding anyway...\n");
+		fmt.Fprintf(ostream, "CAUTION!  Your passphrase ends with a \\r character.  Proceeding anyway...\n")
 	}
-	
+
 	fmt.Fprintf(ostream, "Please enter your salt: ")
-	salt := readln(scanner);
+	salt := readln(scanner)
 	if strings.HasSuffix(salt, "\r") {
-		fmt.Fprintf(ostream, "CAUTION!  Your salt ends with a \\r character.  Proceeding anyway...\n");
+		fmt.Fprintf(ostream, "CAUTION!  Your salt ends with a \\r character.  Proceeding anyway...\n")
 	}
 
 	return passphrase, salt
 }
 
 // reads a single line from the scanner.  does not return separator
-func readln(scanner *bufio.Scanner) (string) {
-	
+func readln(scanner *bufio.Scanner) string {
+
 	if scanner.Scan() {
-	    return scanner.Text();
+		return scanner.Text()
 	}
 
 	if err := scanner.Err(); err != nil {
-	    panic(fmt.Sprintf("Trouble reading input: %v", err))
+		panic(fmt.Sprintf("Trouble reading input: %v", err))
 	}
 	panic("Trouble reading input.")
 }
@@ -87,11 +88,11 @@ func generate(passphrase string, salt string) (string, string) {
 func getPrivate(pri []byte) string {
 	bytes := []byte{0x80}
 	bytes = append(bytes, pri...)
-	
+
 	sh := ShaTwice(bytes)
 	checksum := make([]byte, 4)
 	copy(checksum, sh[:4])
-	
+
 	bytes = append(bytes, checksum...)
 	privWif := string(Hex2Base58(bytes))
 	return privWif
@@ -104,8 +105,8 @@ func getPublic(priv_key []byte) []byte {
 
 	ret := make([]byte, 65)
 	ret[0] = 4
-	copy(ret[1 + 32 - len(xbytes):33], xbytes)
-	copy(ret[33 + 32 - len(ybytes):65], ybytes)
+	copy(ret[1+32-len(xbytes):33], xbytes)
+	copy(ret[33+32-len(ybytes):65], ybytes)
 
 	return ret
 }
@@ -148,8 +149,6 @@ func s2(passphrase []byte, salt []byte) []byte {
 	s2 := pbkdf2.Key(passphrase, salt, 65536, 32, sha256.New)
 	return s2
 }
-
-
 
 func xorBytes(a []byte, b []byte) []byte {
 	if len(a) != len(b) {
